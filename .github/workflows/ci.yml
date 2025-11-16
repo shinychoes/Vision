@@ -31,7 +31,7 @@ jobs:
 
       - name: Security audit
         run: |
-          pip-audit --ignore-vulns "GHSA-2fbw-wxqw-8h3w"
+          pip-audit --ignore-vuln "GHSA-2fbw-wxqw-8h3w"
 
       - name: Build package
         run: |
