@@ -6,7 +6,7 @@ Supports loading named profiles (laptop, phone, slides, tweet) with screen dimen
 """
 
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 import json
 import os
 from pathlib import Path
