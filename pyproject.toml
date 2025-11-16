@@ -4,14 +4,14 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "vision-ui"
-version = "0.1.0"
+version = "0.1.1"
 description = "Screen-aware text & token budgeting utilities (UI_UX)"
 readme = "UI_UX/README.md"
 requires-python = ">=3.8"
 license = { file = "LICENSE" }
 
 authors = [
-  { name = "shinychoes", email = "" }
+  { name = "shinychoes", email = "shinychoes@example.com" }
 ]
 
 keywords = [

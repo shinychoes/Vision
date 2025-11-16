@@ -50,7 +50,18 @@ class Persona:
     example_sentences: Optional[List[str]] = None
     context_prefix: Optional[str] = None
     
-    def apply(self, text: str) -> str:
+    examples_location: str = "append"  # one of: 'prepend', 'append', 'none'
+
+    def examples_text(self) -> str:
+        """Return the persona example lines as a single text block."""
+        if not self.example_sentences:
+            return ""
+        return "\n".join(f"Example: {example}" for example in self.example_sentences)
+
+    def context_text(self) -> str:
+        return self.context_prefix or ""
+
+    def apply(self, text: str, include_examples: bool = True, include_context: bool = True) -> str:
         """Apply persona transformations to text."""
         transformed = text
         
@@ -60,13 +71,17 @@ class Persona:
                 transformed = transformed.replace(old_word, new_word)
         
         # Add context prefix if specified
-        if self.context_prefix:
+        if include_context and self.context_prefix:
             transformed = f"{self.context_prefix}\n\n{transformed}"
-        
+
         # Add example sentences if specified
-        if self.example_sentences:
-            examples = "\n".join(f"Example: {example}" for example in self.example_sentences)
+        if include_examples and self.example_sentences and self.examples_location == "prepend":
+            examples = self.examples_text()
             transformed = f"{examples}\n\n{transformed}"
+
+        if include_examples and self.example_sentences and self.examples_location == "append":
+            examples = self.examples_text()
+            transformed = f"{transformed}\n\n{examples}"
         
         return transformed
 
@@ -165,10 +180,26 @@ def layered_summarize(
                 summary = summarizer(transformed_text, effective_budget - hash_overhead)
             else:
                 summary = summarizer(text, effective_budget - hash_overhead)
+        elif persona and persona.examples_location == "append":
+            # Append persona examples after generating the summary; do not make examples consume
+            # the text budget so headlines remain concise and one_screen/detailed layers can include
+            # persona material as an addendum.
+            effective_budget = layer_budget - hash_overhead
+            summary = summarizer(text, effective_budget)
+            # Append examples/context as a postfix if present
+            examples = persona.examples_text()
+            context = persona.context_text()
+            postfix_items = []
+            if context:
+                postfix_items.append(context)
+            if examples:
+                postfix_items.append(examples)
+            if postfix_items:
+                summary = summary.strip() + "\n\n" + "\n\n".join(postfix_items)
         elif persona and layer_budget > persona_overhead + hash_overhead + 20:  # Keep at least 20 chars for content
             # Other layers use full persona if budget permits
             effective_budget = layer_budget - persona_overhead - hash_overhead
-            # Apply persona transformation for summarization
+            # Apply persona transformation for summarization (includes examples/context)
             persona_text = persona.apply(text)
             summary = summarizer(persona_text, effective_budget)
         else:

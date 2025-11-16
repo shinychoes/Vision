@@ -120,6 +120,29 @@ Calculate character budgets for screen configurations.
 vision-ui budget --width 1920 --height 1080 --font-size 16 --columns 80
 ```
 
+## Release snippet
+
+We publish releases using semantic version tags (vMAJOR.MINOR.PATCH). To create a release:
+
+1. Bump the version in `pyproject.toml`.
+2. Build and test the package locally:
+
+```powershell
+python -m pip install --upgrade build pip
+python -m build
+python -m pip install dist/*.whl
+pytest -q
+```
+
+3. Tag and push the release:
+
+```bash
+git tag -a v0.1.1 -m "Release v0.1.1"
+git push origin v0.1.1
+```
+
+The GitHub `release.yml` workflow will create a GitHub release and optionally publish to PyPI when `PYPI_API_TOKEN` is present in repository secrets.
+
 ## 🎨 Output Examples
 
 ### Rich Triage Board
