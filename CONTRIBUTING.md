@@ -27,6 +27,8 @@ If you witness or experience unacceptable behavior, please refer to the reportin
 
 > These are general guidelines; adapt as needed for language- or subproject-specific workflows.
 
+For now, most concrete code lives in the `UI_UX/` subdirectory (Python one-screen budget utilities). The `Vision/` directory is currently a placeholder for future vision/neural network components. See the root `README.md` and `UI_UX/README.md` for subproject-specific setup instructions.
+
 1. **Fork the repository** (if you are external to `shinychoes`) and create your branch from `main`.
 2. **Create a feature branch**
    - Use a descriptive name (e.g. `feature/add-visualizer`, `fix/augmentations-bug`).

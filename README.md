@@ -1,70 +1,236 @@
-# vision
+# Vision UI
 
-> Everything that has to do with the neural network's connection with the eye.
+> Multi-profile, screen-aware text summarization with OCR support and rich triage board interface.
 
-## About
+## 🎯 Quick Start
 
-`vision` is a public project under the `shinychoes` organization focused on exploring and building systems around how neural networks interact with visual information—from raw pixels and eye-like sensors to higher-level perception.
-
-This repository is intended as a home for experiments, tools, and components related to vision-centric neural network work.
-
-- Organization: [shinychoes](https://github.com/shinychoes)
-- Project: `vision`
-
-## Project layout
-
-The structure will evolve over time. Some notable areas:
-
-- `UI_UX/`
-  - Frontend, prototypes, or design assets.
-  - See [`UI_UX/README.md`](UI_UX/README.md) for UI-specific notes.
-- `Vision/`
-  - Placeholder for core vision / neural network code.
-
-Additional directories and modules will be documented here as the project grows.
-
-## Getting started
-
-> Note: These are generic guidelines; adapt them as the technical stack solidifies.
-
-### Prerequisites
-
-- A recent version of Git
-- A recent version of your preferred programming language runtime (for example Python, Node.js, etc.), depending on which submodule you are working on
-- Recommended: a virtual environment or isolated environment per language/tool
-
-### Clone
+### Installation
 
 ```bash
+# Clone the repository
 git clone https://github.com/shinychoes/vision.git
 cd vision
+
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install in development mode
+pip install -e .
+
+# Install OCR dependencies (optional, for screenshot features)
+# On Ubuntu/Debian:
+sudo apt-get install tesseract-ocr
+# On macOS:
+brew install tesseract
+# On Windows: Download from https://github.com/UB-Mannheim/tesseract/wiki
 ```
 
-### Setup
+### Basic Usage
 
-Follow setup instructions in the subproject you are working on (for example, see `UI_UX/README.md` for UI-specific setup). As the core vision components stabilize, this section will be expanded with concrete steps.
+**1. Multi-Profile Text Summarization**
+```bash
+# Summarize text for different device contexts
+vision-ui summarize-multi --file document.txt --profiles phone,laptop,slides --persona developer
 
-## Usage
+# Compare results in rich triage board format
+vision-ui triage-compare --text document.txt --profiles phone,laptop --show-profile-info
+```
 
-Usage, scripts, and example workflows will be documented here as the repository gains more concrete components (models, datasets, training scripts, demos, etc.).
+**2. Screenshot OCR Summarization**
+```bash
+# Extract text from screenshots and summarize
+vision-ui summarize-screenshot --image screenshot.png --profiles phone,laptop --format triage --verbose
+```
 
-## Contributing
+**3. Budget Analysis**
+```bash
+# Calculate character budgets for different screen configurations
+vision-ui budget --width 1920 --height 1080 --font-size 16
+```
 
-Contributions are welcome.
+## 🚀 Features
 
-- See [`CONTRIBUTING.md`](CONTRIBUTING.md) for how to propose changes, coding style, and review expectations.
-- By participating, you are expected to uphold our [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md).
+### Phase 1: Multi-Profile Summarization
+- **Device-Aware Budgeting**: Automatic character budget calculation based on screen dimensions
+- **Persona System**: Developer, designer, and manager personas with vocabulary and context adaptation
+- **Layered Summaries**: Headline, one-screen, and deep analysis layers
+- **Multi-Profile Support**: Phone, laptop, slides, and custom device profiles
 
-If you are unsure where to start, opening a discussion or small issue is a good first step.
+### Phase 2: OCR & Screenshot Analysis
+- **Image Preprocessing**: Grayscale conversion, contrast enhancement, resizing, and binarization
+- **Text Extraction**: pytesseract integration with confidence filtering
+- **Region Classification**: Automatic categorization of code, UI elements, URLs, and text
+- **Layout-Aware Analysis**: Text density estimation and budget adjustment
 
-## Security
+### Phase 3: Rich Triage Board
+- **Side-by-Side Comparison**: Visual comparison across device contexts
+- **Color-Coded Feedback**: Length-based styling (green/yellow/orange/red)
+- **OCR Metadata Display**: Processing information and quality metrics
+- **Professional Formatting**: Rich console tables with device icons
 
-If you believe you have found a security or privacy issue, please **do not** open a public issue.
+## 📋 CLI Commands
 
-Instead, follow the process described in [`SECURITY.md`](SECURITY.md).
+### `summarize-multi`
+Generate multi-profile summaries from text input.
 
-## License
+```bash
+vision-ui summarize-multi --file INPUT.txt --profiles phone,laptop,slides \
+  --layers headline,one_screen --persona developer
+```
 
-This project is licensed under the **Apache License 2.0**.
+**Options:**
+- `--file`: Input text file or `-` for stdin
+- `--profiles`: Comma-separated profile names
+- `--layers`: Summary layers to generate
+- `--persona`: Optional persona for content adaptation
+- `--format`: Output format (stacked, json, compact)
 
-See the [`LICENSE`](LICENSE) file for full license text.
+### `triage-compare`
+Display summaries in rich triage board format.
+
+```bash
+vision-ui triage-compare --text INPUT.txt --profiles phone,laptop \
+  --persona designer --show-profile-info
+```
+
+**Options:**
+- `--text`: Input text file or `-` for stdin
+- `--profiles`: Device profiles to compare
+- `--show-profile-info`: Display detailed profile specifications
+
+### `summarize-screenshot`
+Extract text from screenshots and generate summaries.
+
+```bash
+vision-ui summarize-screenshot --image screenshot.png --profiles phone,laptop \
+  --format triage --verbose --show-profile-info
+```
+
+**Options:**
+- `--image`: Path to screenshot image file
+- `--profiles`: Target device profiles
+- `--format`: Output format (includes triage)
+- `--verbose`: Show OCR processing metadata
+
+### `budget`
+Calculate character budgets for screen configurations.
+
+```bash
+vision-ui budget --width 1920 --height 1080 --font-size 16 --columns 80
+```
+
+## 🎨 Output Examples
+
+### Rich Triage Board
+```
+🎯 MULTI-PROFILE TRIAGE BOARD
+
+📱 Headline Layer
+┌─────────┬───────────┬──────────┬─────────────────────────────┬──────────┐
+│ Profile │ Device    │ Screen   │ Summary                    │ Length   │
+├─────────┼───────────┼──────────┼─────────────────────────────┼──────────┤
+│ PHONE   │ 📱 Mobile │ 375×667  │ Concise mobile summary      │ 140      │
+│ LAPTOP  │ 💻 Laptop │ 1920×1080│ Detailed desktop summary    │ 437      │
+└─────────┴───────────┴──────────┴─────────────────────────────┴──────────┘
+```
+
+### OCR Metadata
+```
+=== OCR METADATA ===
+Text density: 75.00%
+Regions found: 5
+Preprocessing applied: grayscale, enhance, sharpen
+Image size: 1200 × 900
+```
+
+## 🧪 Testing
+
+Run the comprehensive test suite:
+
+```bash
+# Run all tests
+pytest
+
+# Run specific test categories
+pytest tests/test_profiles.py          # Profile system
+pytest tests/test_summarize.py         # Multi-profile summarization
+pytest tests/test_ocr.py               # OCR functionality
+pytest tests/test_triage.py            # Triage board formatting
+pytest tests/test_screenshot_integration.py  # End-to-end integration
+
+# Run with coverage
+pytest --cov=vision_ui --cov-report=html
+```
+
+## 🏗️ Architecture
+
+```
+vision/
+├── vision_ui/                 # Main package
+│   ├── cli.py                 # Command-line interface
+│   ├── profiles.py            # Device profile management
+│   ├── summarize.py           # Multi-profile summarization
+│   ├── ocr.py                 # OCR and image processing
+│   └── triage.py              # Rich triage board display
+├── UI_UX/                     # Core budget utilities
+│   └── budget.py              # Screen budget calculations
+├── tests/                     # Comprehensive test suite
+├── learning_data/             # Sample datasets
+└── pyproject.toml            # Package configuration
+```
+
+## 📊 Device Profiles
+
+| Profile  | Resolution | Font Size | Columns | Budget    |
+|----------|------------|-----------|---------|-----------|
+| Phone    | 375×667    | 14px      | 40      | ~1,600    |
+| Laptop   | 1920×1080  | 16px      | 80      | ~8,000    |
+| Slides   | 1024×768   | 18px      | 60      | ~4,500    |
+| Tweet    | 400×400    | 14px      | 30      | ~800      |
+
+## 🔧 Configuration
+
+### Custom Profiles
+Create custom device profiles by modifying `vision_ui/profiles.py`:
+
+```python
+Profile(
+    name="tablet",
+    width_px=768,
+    height_px=1024,
+    font_size_px=15,
+    editor_ruler_columns=50,
+    buffer=0.85
+)
+```
+
+### Persona Customization
+Extend personas with vocabulary mappings and context prefixes in the persona system.
+
+## 🤝 Contributing
+
+Contributions are welcome! See [`CONTRIBUTING.md`](CONTRIBUTING.md) for guidelines.
+
+### Development Setup
+```bash
+# Install development dependencies
+pip install -e ".[dev]"
+
+# Run pre-commit checks
+pytest
+pip-audit
+```
+
+## 📄 License
+
+This project is licensed under the **Apache License 2.0**. See [`LICENSE`](LICENSE) for details.
+
+## 🔗 Related Projects
+
+- **UI_UX**: Core screen budget and text processing utilities
+- **Vision**: Future computer vision and neural network components
+
+---
+
+Built with ❤️ by the [shinychoes](https://github.com/shinychoes) organization.

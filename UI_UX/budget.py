@@ -8,7 +8,7 @@ All code is pure Python; no JavaScript.
 from typing import Union
 import textwrap
 from typing import Dict
-from vision.UI_UX.token_utils import estimate_avg_chars_per_token, chars_to_tokens
+from .token_utils import estimate_avg_chars_per_token, chars_to_tokens
 
 
 def compute_budget(width_px: int, height_px: int,

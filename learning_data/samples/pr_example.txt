@@ -1,0 +1,114 @@
+## Add Multi-Profile Summarization Support
+
+### Problem Statement
+Our current summarization system only generates single summaries without considering different device contexts. Users on mobile devices receive the same summary length as desktop users, leading to poor user experience on constrained screens. We need to implement multi-profile summarization that adapts content length and detail based on target device dimensions.
+
+### Proposed Solution
+Implement a multi-profile summarization system that:
+
+1. **Profile Management**: Define device profiles with screen dimensions, font sizes, and reading preferences
+2. **Layered Summaries**: Generate different summary layers (headline, one-screen, deep) for each profile
+3. **Budget Compliance**: Automatically calculate character budgets based on screen real estate
+4. **Persona Adaptation**: Transform content for different audiences (developers, designers, managers)
+
+### Technical Implementation
+
+#### Core Components
+- `vision_ui/profiles.py`: Device profile management with JSON loading support
+- `vision_ui/summarize.py`: Multi-profile layered summarization engine
+- `vision_ui/cli.py`: Command-line interface with `summarize-multi` subcommand
+
+#### Device Profiles
+Built-in profiles optimized for common scenarios:
+- **Laptop**: 1920×1080, 14px font, 80-column ruler
+- **Phone**: 375×667, 12px font, 40-column ruler  
+- **Slides**: 1024×768, 18px font, 60-column ruler
+- **Tweet**: 280×400, 14px font, 40-column ruler
+
+#### Summary Layers
+- **Headline** (10% budget): 1-2 sentences for quick scanning
+- **One-Screen** (80% budget): Fits on one screen of target device
+- **Deep** (100% budget): Full summary with content hash for reference
+
+### Implementation Details
+
+#### Budget Calculation
+```python
+def compute_budget(width_px, height_px, font_size_px=14, editor_ruler_columns=80, buffer=0.9):
+    # Calculate available characters based on screen dimensions
+    # Account for font metrics, line height, and safe buffer
+    return {
+        "target_chars": int(char_budget * buffer),
+        "effective_columns": min(columns, editor_ruler_columns),
+        "lines": height_px // line_height_px
+    }
+```
+
+#### Multi-Profile Summarization
+```python
+def multi_profile_summarize(text, profiles, layers=['headline', 'one_screen', 'deep'], persona=None):
+    results = {}
+    for profile in profiles:
+        budget = compute_budget(profile.width_px, profile.height_px, profile.font_size_px)
+        summaries = layered_summarize(text, budget["target_chars"], layers, persona)
+        results[profile.name] = summaries
+    return results
+```
+
+#### Persona System
+Personas adapt content through:
+- **Vocabulary Mapping**: Replace generic terms with domain-specific language
+- **Context Prefixes**: Add perspective-setting introductions
+- **Example Sentences**: Include relevant domain examples
+
+### CLI Interface
+```bash
+# Basic multi-profile summary
+vision-ui summarize-multi --file README.md --profiles phone,laptop
+
+# With persona and specific layers
+vision-ui summarize-multi --file PR.md --profiles slides --layers headline --persona developer
+
+# JSON output for programmatic use
+vision-ui summarize-multi --file report.txt --profiles phone,laptop,slides --format json
+```
+
+### Testing Strategy
+- **Unit Tests**: Profile loading, budget calculation, persona application
+- **Integration Tests**: CLI end-to-end functionality, output format validation
+- **Budget Compliance**: Verify summaries stay within calculated character limits
+- **Human Evaluation**: A/B testing with real PR content and developer feedback
+
+### Security Considerations
+- Profile definitions stored locally (no external dependencies)
+- Persona content curated to avoid sensitive information
+- No data transmission to external APIs during summarization
+
+### Migration Path
+1. **Phase 1**: Core multi-profile functionality with basic personas
+2. **Phase 2**: Screenshot-aware summarization with OCR integration
+3. **Phase 3**: Triage board UI and advanced persona management
+
+### Success Metrics
+- **Budget Fidelity**: 95% of summaries within calculated character limits
+- **User Satisfaction**: Improved readability scores across device types
+- **Performance**: Sub-second summarization for documents up to 10KB
+- **Adoption**: CLI usage in developer workflows and CI/CD pipelines
+
+### Dependencies
+- `UI_UX.budget`: Core budget computation utilities
+- `dataclasses`: Profile and configuration data structures
+- `argparse`: CLI argument parsing
+- `pytest`: Test framework and validation
+
+### Deliverables
+- [x] Profile management system with JSON loading
+- [x] Multi-profile layered summarization engine
+- [x] CLI with `summarize-multi` subcommand
+- [x] Comprehensive test suite (54 tests passing)
+- [x] Documentation and usage examples
+- [x] Budget compliance validation
+- [ ] Performance benchmarks and metrics dashboard
+- [ ] Sample dataset for testing and demos
+
+This implementation provides a solid foundation for screen-aware content summarization while maintaining backward compatibility with existing budget computation utilities.

@@ -1,4 +1,4 @@
-venv# Vision / UI-UX — one-screen budget (Python)
+# Vision / UI-UX — one-screen budget (Python)
 
 This folder contains a Python-native implementation of the "one-screen" screen-ratio configuration and visual reference discovered during the chat log you provided.
 It includes code and tooling for calculating a response budget for a standard "one-screen" reply and a small CLI demo to visualize the usage.
@@ -6,8 +6,11 @@ It includes code and tooling for calculating a response budget for a standard "o
 What this folder includes:
 - `screen_ratio_schema.json` — JSON example describing a screen profile and the computed one-screen budget
 - `budget.py` — Core functions to compute budgets, show progress bars, and naive summarization
+- `token_utils.py` — Optional helpers for token-aware budgets and token/character estimates
 - `demo_cli.py` — Terminal demo to compute budgets and print a one-screen formatted summary for sample screen sizes; no JavaScript required
 - `test_budget.py` — pytest unit tests for the `compute_budget` and `naive_summarize` utilities
+- `test_token_utils.py` — pytest unit tests for the token utilities
+- `requirements.txt` — Development and test dependencies for this module
 
 How to run the demo (Python only):
 
